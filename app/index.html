@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather & Fashion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .weather-bg-sunny {
+      background-image: url('https://source.unsplash.com/1600x900/?sunny,sky');
+    }
+    .weather-bg-cloudy {
+      background-image: url('https://source.unsplash.com/1600x900/?cloudy,sky');
+    }
+    .weather-bg-rainy {
+      background-image: url('https://source.unsplash.com/1600x900/?rain,sky');
+    }
+    .weather-bg {
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+
+<body id="body" class="text-white font-sans min-h-screen weather-bg">
+  <div class="bg-blue-600 bg-opacity-60 min-h-screen">
+    <div class="max-w-md mx-auto pt-20 px-6">
+
+      <!-- City and Current Temp -->
+      <div class="text-center mb-10">
+        <div class="text-2xl font-light tracking-wide" id="city"></div>
+        <div class="text-[80px] font-thin leading-none" id="currentTemp"></div>
+        <div class="text-lg capitalize mt-2" id="weather"></div>
+        <div class="text-sm text-blue-100" id="hiLo"></div>
+      </div>
+
+      <!-- Description -->
+      <div class="text-center mb-6 text-sm text-blue-100 italic" id="description"></div>
+
+      <!-- Hourly Forecast -->
+      <div class="bg-white bg-opacity-10 rounded-2xl p-4 flex justify-between overflow-x-auto space-x-4 text-center" id="hourly"></div>
+
+      <!-- Weekly Forecast -->
+      <div class="mt-10">
+        <div class="text-sm text-blue-100 mb-3 uppercase tracking-wider">1週間の天気</div>
+        <div id="weekly"></div>
+      </div>
+
+      <!-- Outfit Suggestion -->
+      <div class="mt-12 p-5 bg-white bg-opacity-10 rounded-2xl shadow text-center">
+        <div class="text-lg font-semibold">今日のコーディネート提案</div>
+        <p class="mt-3 text-base leading-relaxed" id="suggestion"></p>
+      </div>
+
+      <!-- Category Buttons -->
+      <div class="mt-10 text-center">
+        <div class="text-sm text-blue-100 mb-2">カテゴリを選択:</div>
+        <div class="flex flex-wrap justify-center gap-3">
+          <button class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm hover:bg-opacity-30 transition">カジュアル</button>
+          <button class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm hover:bg-opacity-30 transition">キレイめ</button>
+          <button class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm hover:bg-opacity-30 transition">ノームコア</button>
+          <button class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm hover:bg-opacity-30 transition">テック</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 疑似データ生成
+    const cities = ["東京", "大阪", "札幌", "福岡", "名古屋"];
+    const weathers = [
+      {text: "晴れ", icon: "☀️", bg: "sunny"},
+      {text: "曇り", icon: "☁️", bg: "cloudy"},
+      {text: "雨", icon: "🌧️", bg: "rainy"},
+    ];
+    const outfits = [
+      "Tシャツにデニムのシンプルスタイル",
+      "薄手のジャケットとシャツでキレイめに",
+      "パーカーにワイドパンツでリラックス感を",
+      "テック系アウターとスニーカーで都会的に",
+      "シャツ＋ニットで大人カジュアル",
+    ];
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // 今日のデータ
+    const city = cities[rand(0, cities.length-1)];
+    const todayWeather = weathers[rand(0, weathers.length-1)];
+    const tempMax = rand(-5, 35);
+    const tempMin = tempMax - rand(2, 10);
+    const currentTemp = rand(tempMin, tempMax);
+
+    document.getElementById("city").innerText = city;
+    document.getElementById("currentTemp").innerText = `${currentTemp}°`;
+    document.getElementById("weather").innerText = `${todayWeather.text} ${todayWeather.icon}`;
+    document.getElementById("hiLo").innerText = `H:${tempMax}°  L:${tempMin}°`;
+    document.getElementById("description").innerText = "ランダム生成されたお天気データです";
+
+    // 背景変更
+    document.getElementById("body").classList.add(`weather-bg-${todayWeather.bg}`);
+
+    // 時間ごとの予報
+    const hourlyContainer = document.getElementById("hourly");
+    for (let i = 0; i < 6; i++) {
+      const hour = rand(0, 23);
+      const t = rand(tempMin, tempMax);
+      const w = weathers[rand(0, weathers.length-1)];
+      hourlyContainer.innerHTML += `
+        <div class="min-w-[50px]">
+          <div class="text-sm mb-1">${hour}時</div>
+          <div class="text-xl font-light">${t}°</div>
+          <div class="mt-1">${w.icon}</div>
+        </div>`;
+    }
+
+    // 週間予報
+    const weeklyContainer = document.getElementById("weekly");
+    const days = ["月","火","水","木","金","土","日"];
+    for (let i = 0; i < 7; i++) {
+      const min = rand(-5, 30);
+      const max = min + rand(2, 10);
+      const w = weathers[rand(0, weathers.length-1)];
+      const percent = ((max - (-10)) / (40 - (-10))) * 100;
+      weeklyContainer.innerHTML += `
+        <div class="flex items-center justify-between text-sm py-2 border-b border-white border-opacity-10">
+          <div class="w-1/4">${days[i]}</div>
+          <div class="w-1/4 text-center">${w.icon}</div>
+          <div class="w-1/2 flex items-center space-x-2">
+            <span class="text-blue-100">${min}°</span>
+            <div class="flex-1 h-2 bg-white bg-opacity-20 rounded overflow-hidden">
+              <div class="h-2 bg-gradient-to-r from-yellow-300 via-orange-400 to-red-400" style="width: ${percent}%"></div>
+            </div>
+            <span class="text-white">${max}°</span>
+          </div>
+        </div>`;
+    }
+
+    // コーデ提案
+    let suggestion = "";
+    if (currentTemp < 5) suggestion = "寒いのでコートや厚手のニットをおすすめします";
+    else if (currentTemp < 15) suggestion = "ジャケットやカーディガンがちょうどいいです";
+    else if (currentTemp < 25) suggestion = "Tシャツやシャツで快適に過ごせます";
+    else suggestion = "半袖＋ショートパンツで涼しく！";
+
+    // 天気によって一工夫
+    if (todayWeather.text === "雨") suggestion += "。雨具を忘れずに！";
+
+    // ランダム要素
+    suggestion += " " + outfits[rand(0, outfits.length-1)];
+
+    document.getElementById("suggestion").innerText = suggestion;
+  </script>
+</body>
+</html>
